@@ -3,24 +3,38 @@ import React, { useState, useEffect, Fragment } from 'react'
 import { List, Item } from './styles'
 import { Category } from '../Category'
 
-export const ListOfCategories = () => {
-  const [showFixed, setShowFixed] = useState(false)
+// CustomHook
+function useCategoriesData () {
+  const [loading, setLoading] = useState(false)
   const [categories, setCategories] = useState([])
-
-  const renderList = (fixed) => (
-    <List className={fixed ? 'fixed' : ''}>
-      {
-        categories.map(category => <Item key={category.id}><Category {...category} /></Item>)
-      }
-    </List>
-  )
 
   // componentDidMount
   useEffect(function () {
+    setLoading(true)
     window.fetch('https://petgram-server-hecto932.hflores.now.sh/categories')
       .then(response => response.json())
-      .then(response => { setCategories(response) })
+      .then(response => {
+        setCategories(response)
+        setLoading(false)
+      })
   }, [])
+
+  return { categories, loading }
+}
+
+export const ListOfCategories = () => {
+  const { categories, loading } = useCategoriesData()
+  const [showFixed, setShowFixed] = useState(false)
+
+  const renderList = (fixed) => (
+    <List fixed={fixed}>
+      {
+        loading
+          ? <Item key='loading'><Category /></Item>
+          : categories.map(category => <Item key={category.id}><Category {...category} /></Item>)
+      }
+    </List>
+  )
 
   useEffect(function () {
     const onScroll = e => {

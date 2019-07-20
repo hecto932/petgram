@@ -1,12 +1,22 @@
 import React, { Fragment, useEffect, useRef, useState } from 'react'
 import { Article, Button, ImgWrapper, Img } from './styles'
-import { MdFavoriteBorder } from 'react-icons/md'
+import { MdFavoriteBorder, MdFavorite } from 'react-icons/md'
 
 const DEFAULT_IMAGE = 'https://images.unsplash.com/photo-1520561805070-83c413349512?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=800&q=60'
 export const PhotoCard = ({ id, likes = 0, src = DEFAULT_IMAGE }) => {
-  const [show, setShow] = useState(false)
   const element = useRef(null)
+  const [show, setShow] = useState(false)
+  const key = `like-${id}`
+  const [liked, setLiked] = useState(() => {
+    try {
+      const like = window.localStorage.getItem(key)
+      return like
+    } catch (err) {
+      console.error(err)
+    }
+  })
 
+  console.log(liked)
   useEffect(function () {
     Promise.resolve(
       typeof window.IntersectionObserver !== 'undefined'
@@ -26,6 +36,16 @@ export const PhotoCard = ({ id, likes = 0, src = DEFAULT_IMAGE }) => {
       })
   }, [element])
 
+  const Icon = liked ? MdFavorite : MdFavoriteBorder
+  const setLocalStorage = value => {
+    try {
+      window.localStorage.setItem(key, value)
+      setLiked(value)
+    } catch (err) {
+      console.error(err)
+    }
+  }
+
   return (
     <Article ref={element}>
       {show && (
@@ -36,8 +56,8 @@ export const PhotoCard = ({ id, likes = 0, src = DEFAULT_IMAGE }) => {
             </ImgWrapper>
           </a>
 
-          <Button>
-            <MdFavoriteBorder size={`32px`} /> {likes} likes!
+          <Button onClick={() => setLocalStorage(!liked)}>
+            <Icon size={`32px`} /> {likes} likes!
           </Button>
         </Fragment>
       )}

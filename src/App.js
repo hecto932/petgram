@@ -24,7 +24,7 @@ const App = () => {
       <Router>
         <NotFound default />
         <Home path='/' />
-        <Home path='/pet/:id' />
+        <Home path='/pet/:categoryId' />
         <Detail path='/detail/:detailId' />
         {!isAuth && <NoRegisteredUser path='/login' />}
         {!isAuth && <Redirect from='/favs' to='/login' />}
